@@ -40,7 +40,7 @@ public class ScheduleService {
     public Page<ScheduleResponseDto.GetAll> getAllSchedule(Pageable pageable) {
         Page<Schedule> schedulesPages = scheduleRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "createdAt")));
         Page<ScheduleResponseDto.GetAll> schedulePageResponseDtos = schedulesPages.map(
-                s -> new ScheduleResponseDto.GetAll(s.getUserId().getEmail(), s.getTitle(), s.getCreatedAt(), commentService.countComment(s.getId())));
+                s -> new ScheduleResponseDto.GetAll(s.getUser().getEmail(), s.getTitle(), s.getCreatedAt(), commentService.countComment(s.getId())));
         return schedulePageResponseDtos;
     }
 
@@ -50,7 +50,7 @@ public class ScheduleService {
         Schedule schedule = getSchedule(scheduleId);
         Page<CommentResponseDto.GetComment> commentPage = commentService.getAllComment(schedule, pageable);
         return new ScheduleResponseDto.GetOne(
-                schedule.getUserId().getEmail(),
+                schedule.getUser().getEmail(),
                 schedule.getTitle(),
                 schedule.getContent(),
                 schedule.getCreatedAt(),
@@ -64,7 +64,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, ErrorType.NO_RESOURCE, "일정이 존재하지 않습니다."));
 
-        if (schedule.getUserId().getId() != userId) {
+        if (schedule.getUser().getId() != userId) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorType.INVALID_PARAMETER, "자신의 일정만 수정할 수 있습니다.");
         }
         if (updateDto.getTitle() == null && updateDto.getContent() == null) {
@@ -79,7 +79,7 @@ public class ScheduleService {
     public void deleteSchedule(Long userId, Long scheduleId) {
         // todo 메서드로 가져온 entity 객체가 트렌젝션으로 삭제(수정)가 되는가 확인 필요
         Schedule schedule = getSchedule(scheduleId);
-        if (schedule.getUserId().getId() != userId) {
+        if (schedule.getUser().getId() != userId) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorType.INVALID_PARAMETER, "자신의 일정만 삭제할 수 있습니다.");
         }
         scheduleRepository.delete(getSchedule(scheduleId));

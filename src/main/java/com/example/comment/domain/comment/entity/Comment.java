@@ -32,16 +32,16 @@ public class Comment extends BaseEntity {
 
     @JoinColumn(nullable = false)
     @ManyToOne
-    private User userId;
+    private User user;
 
     @Column(nullable = false, length = 200)
     private String content;
 
-    public Comment(Schedule scheduleId, User userId, String content) {
+    public Comment(Schedule scheduleId, User user, String content) {
         this.scheduleId = scheduleId;
         this.depth = 0;
         this.countReply = 0;
-        this.userId = userId;
+        this.user = user;
         this.content = content;
     }
 

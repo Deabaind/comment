@@ -49,14 +49,14 @@ public class CommentService {
         List<CommentResponseDto.Reply> replyList = new ArrayList<>();
         for (Comment comment : commentList) {
             replyList.add(new CommentResponseDto.Reply(
-                    comment.getUserId().getId(),
+                    comment.getUser().getId(),
                     comment.getContent(),
                     comment.getCreatedAt()
             ));
         }
         return new CommentResponseDto.GetOne(
                 findComment.getScheduleId().getTitle(),
-                findComment.getUserId().getEmail(),
+                findComment.getUser().getEmail(),
                 findComment.getContent(),
                 findComment.getCreatedAt(),
                 replyList);
@@ -67,7 +67,7 @@ public class CommentService {
     public Page<CommentResponseDto.GetComment> getAllComment(Schedule schedule, Pageable pageable) {
         Page<Comment> commentPage = commentRepository.findAllByDepthAndScheduleId(0, schedule, pageable);
         Page<CommentResponseDto.GetComment> dtoPage = commentPage.map(
-                d -> new CommentResponseDto.GetComment(d.getUserId().getId(), d.getContent(), d.getCreatedAt(), countReply(d.getId()))
+                d -> new CommentResponseDto.GetComment(d.getUser().getId(), d.getContent(), d.getCreatedAt(), countReply(d.getId()))
         );
         return dtoPage;
     }
@@ -76,7 +76,7 @@ public class CommentService {
     @Transactional
     public void updateComment(Long userId, Long commentId, CommentRequestDto.Update updateDto) {
         Comment comment = getComment(commentId);
-        if (comment.getUserId().getId() != userId) {
+        if (comment.getUser().getId() != userId) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorType.INVALID_PARAMETER, "자신의 댓글만 수정할 수 있습니다.");
         }
         comment.update(updateDto.getContent());
@@ -86,7 +86,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long userId, Long commentId) {
         Comment comment = getComment(commentId);
-        if (comment.getUserId().getId() != userId) {
+        if (comment.getUser().getId() != userId) {
             throw new ApiException(HttpStatus.FORBIDDEN, ErrorType.INVALID_PARAMETER, "자신의 댓글만 삭제할 수 있습니다.");
         }
         commentRepository.delete(getComment(commentId));
