@@ -1,6 +1,8 @@
 package com.example.comment.domain.schedule.entity;
 
-import com.example.comment.domain.common.BaseEntity;
+import com.example.comment.domain.common.entity.BaseEntity;
+import com.example.comment.domain.schedule.dto.ScheduleRequestDto;
+import com.example.comment.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +20,9 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn
-    private Long writerId;
+    @JoinColumn(nullable = false)
+    @ManyToOne
+    private User userId;
 
     @Column(nullable = false, length = 30)
     private String title;
@@ -27,9 +30,14 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String content;
 
-    public Schedule(Long writerId, String title, String content) {
-        this.writerId = writerId;
+    public Schedule(User userId, String title, String content) {
+        this.userId = userId;
         this.title = title;
         this.content = content;
+    }
+
+    public void update(ScheduleRequestDto.Update updateDto) {
+        this.title = updateDto.getTitle();
+        this.content = updateDto.getContent();
     }
 }
