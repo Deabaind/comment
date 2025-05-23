@@ -10,7 +10,7 @@ PROJECT
 ### 필수 기능<br>
 일정 CRUD<br>
 댓글, 대댓글 CRUD
-
+🦊
 ### 추가로 도전한 기능<br>
 유저 CRUD<br>
 Security 적용
